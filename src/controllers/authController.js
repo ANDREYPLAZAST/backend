@@ -108,3 +108,50 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 }; 
+
+exports.register = async (req, res) => {
+  try {
+    const { 
+      email, 
+      password, 
+      nombre, 
+      apellido, 
+      tipoDocumento, 
+      numeroCedula, 
+      ciudad, 
+      codigoPais, 
+      numeroTelefonico 
+    } = req.body;
+
+    // Validar campos requeridos
+    if (!email || !password || !nombre || !apellido || !tipoDocumento || !numeroCedula || !ciudad || !numeroTelefonico) {
+      return res.status(400).json({ message: 'Por favor, completa todos los campos' });
+    }
+
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'El email ya está registrado' });
+    }
+
+    // Crear el usuario
+    const newUser = new User({
+      email,
+      password: await bcrypt.hash(password, 10),
+      nombre,
+      apellido,
+      tipoDocumento,
+      numeroCedula,
+      ciudad,
+      codigoPais,
+      numeroTelefonico
+    });
+
+    await newUser.save();
+    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};

@@ -24,10 +24,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Usar las rutas
 app.use('/api', authRoutes);
 
-// Ruta de prueba
-app.get('/test', (req, res) => {
-  res.json({ message: 'Backend is working!' });
-});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
