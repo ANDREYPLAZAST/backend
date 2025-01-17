@@ -25,8 +25,7 @@ const userSchema = new mongoose.Schema({
   },
   numeroCedula: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   ciudad: {
     type: String,

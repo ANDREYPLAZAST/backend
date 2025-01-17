@@ -128,10 +128,16 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Por favor, completa todos los campos' });
     }
 
-    // Verificar si el usuario ya existe
+    // Verificar si el usuario ya existe por correo electrónico
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'El email ya está registrado' });
+      return res.status(400).json({ message: 'El correo ya está registrado. Por favor, inicia sesión.' });
+    }
+
+    // Verificar si el número de cédula ya está registrado
+    const existingCedula = await User.findOne({ numeroCedula });
+    if (existingCedula) {
+      return res.status(400).json({ message: 'El número de cédula ya está asociado a una cuenta.' });
     }
 
     // Crear el usuario
@@ -152,6 +158,6 @@ exports.register = async (req, res) => {
 
   } catch (error) {
     console.error('Error al registrar usuario:', error);
-    res.status(500).json({ message: 'Error del servidor' });
+    res.status(500).json({ message: 'Error del servidor', error: error.message });
   }
 };
