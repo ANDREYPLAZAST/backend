@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-// Importar rutas desde la ubicación correcta
+// Importar rutas
 const authRoutes = require('./src/routes/authRoutes');
+
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -23,7 +24,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Usar las rutas
 app.use('/api', authRoutes);
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
