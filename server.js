@@ -1,11 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 // Importar rutas
-const authRoutes = require('./src/routes/authRoutes');
-
+const authRoutes = require('./src/routes/auth');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -24,6 +24,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Usar las rutas
 app.use('/api', authRoutes);
+
+// Servir archivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

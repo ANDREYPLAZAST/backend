@@ -89,37 +89,44 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    // Verificar si el OTP está almacenado y no ha expirado
     if (!otpStore[email]) {
       return res.status(400).json({ message: 'Código de verificación no válido' });
     }
 
     const storedOTP = otpStore[email];
     
-    // Verificar si el OTP ha expirado
     if (new Date() > storedOTP.expiresAt) {
-      delete otpStore[email]; // Limpiar OTP expirado
+      delete otpStore[email];
       return res.status(400).json({ message: 'El código ha expirado' });
     }
 
-    // Verificar si el OTP coincide
-    if (storedOTP.otp !== otp) {
-      return res.status(400).json({ message: 'Código incorrecto' });
+    if (otp !== storedOTP.otp) {
+      return res.status(400).json({ message: 'Código de verificación incorrecto' });
     }
 
-    // Eliminar OTP de la memoria
+    const user = await User.findOne({ email });
+    
+    // Generar token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    
+    // Eliminar OTP usado
     delete otpStore[email];
 
-    // Obtener usuario y generar token
-    const user = await User.findOne({ email });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
+    // Devolver respuesta con todos los datos necesarios, incluyendo profileImage
     res.json({
       token,
       user: {
         id: user._id,
         email: user.email,
-      },
+        nombre: user.nombre,
+        apellido: user.apellido,
+        tipoDocumento: user.tipoDocumento,
+        numeroCedula: user.numeroCedula,
+        ciudad: user.ciudad,
+        codigoPais: user.codigoPais,
+        numeroTelefonico: user.numeroTelefonico,
+        profileImage: user.profileImage  // Añadido el campo profileImage
+      }
     });
   } catch (error) {
     console.error('Error verificando OTP:', error);
@@ -133,7 +140,19 @@ exports.getProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    res.json(user);
+    // Asegurarse de que profileImage esté incluido en la respuesta
+    res.json({
+      id: user._id,
+      email: user.email,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      tipoDocumento: user.tipoDocumento,
+      numeroCedula: user.numeroCedula,
+      ciudad: user.ciudad,
+      codigoPais: user.codigoPais,
+      numeroTelefonico: user.numeroTelefonico,
+      profileImage: user.profileImage
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error del servidor' });
   }

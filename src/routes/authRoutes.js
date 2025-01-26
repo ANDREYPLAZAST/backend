@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
 const auth = require('../middleware/auth');
 
 // Ruta para login
@@ -22,5 +23,8 @@ router.post('/auth/reset-password', authController.resetPassword);
 
 // Ruta para solicitar restablecimiento de contraseña
 router.post('/auth/forgot-password', authController.forgotPassword);
+
+// Agregar la ruta de cambio de contraseña
+router.put('/users/change-password', auth, userController.changePassword);
 
 module.exports = router;
