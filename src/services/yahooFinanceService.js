@@ -1,20 +1,28 @@
 const yahooFinance = require('yahoo-finance2').default;
 
-async function obtenerDatosFondo(fondoTicker) {
+const obtenerDatosFondo = async (fondoTicker) => {
     try {
-        const datos = await yahooFinance.quote(fondoTicker);
+        // Configuración básica
+        const queryOptions = {
+            modules: ['price', 'summaryDetail']  // Solo módulos necesarios
+        };
+
+        const datos = await yahooFinance.quote(fondoTicker, queryOptions);
+        console.log('Datos recibidos:', datos);
+
         return {
-            nombre: datos.shortName,
-            precio: datos.regularMarketPrice,
-            variacion: datos.regularMarketChangePercent,
-            volumen: datos.regularMarketVolume,
-            apertura: datos.regularMarketOpen,
-            maximo: datos.regularMarketDayHigh,
-            minimo: datos.regularMarketDayLow
+            nombre: datos.shortName || datos.longName || 'N/A',
+            precio: datos.regularMarketPrice || 0,
+            variacion: datos.regularMarketChangePercent || 0,
+            volumen: datos.regularMarketVolume || 0,
+            apertura: datos.regularMarketOpen || 0,
+            maximo: datos.regularMarketDayHigh || 0,
+            minimo: datos.regularMarketDayLow || 0
         };
     } catch (error) {
-        throw error;
+        console.error('Error detallado:', error);
+        throw new Error(`No se pudieron obtener los datos para ${fondoTicker}`);
     }
-}
+};
 
 module.exports = { obtenerDatosFondo }; 
